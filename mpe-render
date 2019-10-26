@@ -1,0 +1,36 @@
+#/usr/bin/env bash
+
+EXECUTION_DIR=$(dirname $(pwd))
+MPE_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+## Template
+
+TEMPLATE_NAME="mpe_template.tex"
+function find_template() {
+  START=$PWD; while [ $PWD != "/" ]; \
+  do ls | grep -w -q "$TEMPLATE_NAME" && echo "$PWD/$TEMPLATE_NAME" ;cd ..; done ; cd $START
+}
+DETECTED_TEMPLATE=$(find_template)
+TEMPLATE_FILE=${DETECTED_TEMPLATE:-"$DIR/template.tex"}
+
+## File
+INPUT_FILENAME=$1
+INPUT_DIRECTORY=$(dirname "$INPUT_FILENAME")
+INPUT_DIRECTORY_BASENAME=$(basename -- "$INPUT_FILENAME")
+OUTPUT_NAME=$(echo "$INPUT_DIRECTORY_BASENAME" | sed 's/\..*/.pdf/')
+
+## Start rendering
+
+cd "$INPUT_DIRECTORY"
+
+cat "$INPUT_FILENAME" \
+  | node "$MPE_SOURCE_DIR/replace.js" \
+  | pandoc \
+    --include-in-header "$TEMPLATE_FILE" \
+    --filter $MPE_SOURCE_DIR/dot2tex-filter.py \
+    -H $MPE_SOURCE_DIR/tikz-preamble.tex \
+    -o "$OUTPUT_NAME"
+
+# Cleanup
+
+cd "$EXECUTION_DIR"
