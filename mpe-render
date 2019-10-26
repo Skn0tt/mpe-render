@@ -1,17 +1,17 @@
 #/usr/bin/env bash
 
-EXECUTION_DIR=$(dirname $(pwd))
-MPE_SOURCE_DIR=$(dirname $(readlink -f $0))
+EXECUTION_DIR="$(dirname "$(pwd)")"
+MPE_SOURCE_DIR="$(dirname "$(readlink -f "$0")")"
 
 ## Template
 
 TEMPLATE_NAME="mpe_template.tex"
 function find_template() {
-  START=$PWD; while [ $PWD != "/" ]; \
-  do ls | grep -w -q "$TEMPLATE_NAME" && echo "$PWD/$TEMPLATE_NAME" ;cd ..; done ; cd $START
+  START="$PWD"; while [ "$PWD" != "/" ]; \
+  do ls | grep -w -q "$TEMPLATE_NAME" && echo "$PWD/$TEMPLATE_NAME" ;cd ..; done ; cd "$START"
 }
-DETECTED_TEMPLATE=$(find_template)
-TEMPLATE_FILE=${DETECTED_TEMPLATE:-"$DIR/template.tex"}
+DETECTED_TEMPLATE="$(find_template)"
+TEMPLATE_FILE=${DETECTED_TEMPLATE:-"$MPE_SOURCE_DIR/template.tex"}
 
 ## File
 INPUT_FILENAME=$1
@@ -28,7 +28,7 @@ cat "$INPUT_FILENAME" \
   | pandoc \
     --include-in-header "$TEMPLATE_FILE" \
     --filter $MPE_SOURCE_DIR/dot2tex-filter.py \
-    -H $MPE_SOURCE_DIR/tikz-preamble.tex \
+    -H "$MPE_SOURCE_DIR"/tikz-preamble.tex \
     -o "$OUTPUT_NAME"
 
 # Cleanup
