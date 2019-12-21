@@ -20,10 +20,10 @@ def dot2tex(key, value, format, meta):
                 scale = pair[1]
         graph = value[1]
         p = Popen(['dot2tex', '--figonly', '--autosize', '--codeonly'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-        response = p.communicate(input=bytes(graph, "utf-8"))
+        response = p.communicate(input=bytes(graph.encode("utf-8")))
         err = response[1].decode("utf-8")
         if len(err) != 0:
-            raise ValueError(err)
+            raise ValueError(err.encode("utf-8"))
         tikz_code = response[0].decode("utf-8")
         result = "\\begin{figure}\n\\centering\\begin{tikzpicture}[scale=" + scale + "]" + tikz_code + "\\end{tikzpicture}\\caption{" + caption + "} \\label{" + label + "}\\end{figure}"
         return {
